@@ -1,0 +1,45 @@
+---
+description: Global rules for Side Hustle Tax Return website
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# BRAND: Side Hustle Tax Co.
+
+## 1. Who we are
+We are NOT a traditional accountancy. We are for UK side-hustlers aged 20-35 who sell on Etsy / eBay / Vinted, drive for Uber / Deliveroo, do OnlyFans / TikTok / Airbnb.
+Tone: Helpful friend who knows tax. Calm, human, direct. Like Monzo / Starling, not Deloitte. Zero corporate jargon.
+Language: UK English only. Say HMRC, not IRS. Say Self Assessment, Trading Allowance, Making Tax Digital. Never say "tax solutions".
+
+## 2. Design System - NEVER BREAK
+- Framework: React + Tailwind CSS only. No custom CSS files, no styled-components.
+- Colors: bg #FEFEFB off-white, text #111827 charcoal, primary accent #10B981 green (trust), secondary accent #FACC15 yellow for CTAs/highlights only. Use soft gray #F3F4F6 for cards.
+- Typography: Inter or similar sans. Headlines: bold, tight tracking, 40px+ on desktop. Body: 16-18px, relaxed line height.
+- UI: rounded-2xl everywhere, generous padding p-6 to p-8, soft shadows shadow-sm. No sharp corners. No gradients unless very subtle.
+- Icons: lucide-react only. No emojis in UI (except favicon).
+- Animation: framer-motion only. Use subtle fade-in and y: 10 -> 0. No bouncy, no spin.
+
+## 3. Copy Rules
+- Short sentences. Max 18 words per sentence.
+- Headlines must include a benefit or pain. Bad: "Our Services". Good: "We'll sort your tax return."
+- Always answer "do I need to file?" - that's the #1 anxiety.
+- Price must always be fixed-fee. Never show hourly rates.
+- Add social proof near every CTA: Trustpilot 4.9, 2,300+ filed.
+
+## 4. Code Rules
+- Single page app in App.jsx is OK. Keep components inline for simplicity.
+- Mobile-first: test at 375px width. Stack columns on mobile.
+- Forms: no backend. On submit, show toast "Nice one, we'll be in touch in 2 hours" and log to console.
+- SEO: semantic HTML, h1 -> h2 -> h3. Add FAQ schema.
+- Performance: no large images. Use unsplash placeholders with w=600. Lazy load.
+- Never add dependencies without asking.
+
+## 5. What to NEVER do
+- NEVER make it look corporate / blue / stuffy / stock photo of handshake
+- NEVER use American tax terms
+- NEVER use Lorem Ipsum - write real, helpful UK side-hustle copy
+- NEVER make pricing unclear
+- NEVER add a dashboard, login, or auth - this is a marketing landing only
+
+## 6. Conversion Goal
+Every section should push to one action: "Get Started" scrolling to pricing / form. Sticky CTA after hero. No dead ends.
