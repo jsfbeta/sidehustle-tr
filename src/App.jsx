@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
   Bike,
   Camera,
   Check,
+  CircleAlert,
+  CircleCheck,
   Clock,
   FileCheck,
   Home,
@@ -87,6 +89,267 @@ function CtaButton({ children, className = '' }) {
   )
 }
 
+const hustlePills = [
+  { id: 'vinted', label: 'Vinted/eBay/Depop' },
+  { id: 'etsy', label: 'Etsy/Shopify' },
+  { id: 'uber', label: 'Uber/Deliveroo/Uber Eats' },
+  { id: 'creator', label: 'TikTok/YouTube/OnlyFans' },
+  { id: 'airbnb', label: 'Airbnb' },
+  { id: 'other', label: 'Other freelance' },
+]
+
+const incomeOptions = [
+  { id: 'under', label: 'Under £1,000' },
+  { id: 'mid', label: '£1,000 - £12,570' },
+  { id: 'over', label: 'Over £12,570' },
+  { id: 'unsure', label: 'Not sure' },
+]
+
+const payeOptions = [
+  { id: 'yes', label: 'Yes, employed full/part time' },
+  { id: 'no', label: 'No, self-employed / side hustle only' },
+]
+
+function quizResult({ income, paye }) {
+  if (income === 'under') {
+    return {
+      tone: 'green',
+      icon: CircleCheck,
+      title: "You're probably fine! 🎉",
+      copy: "Under HMRC's £1,000 trading allowance, you usually don't need to file. BUT if you want to claim expenses or you got a letter from HMRC, you still might want to.",
+      cta: 'Double-check for free - chat with us',
+    }
+  }
+
+  if (income === 'mid' && paye === 'yes') {
+    return {
+      tone: 'amber',
+      icon: CircleAlert,
+      title: 'Yes, you likely need to file 😬',
+      copy: "Because you're over the £1k trading allowance, HMRC wants a Self Assessment, even though you're PAYE. It's just to declare the side income. We can sort it for £199.",
+      note: 'Most people like you choose our £199 Starter',
+      cta: 'Get sorted for £199',
+    }
+  }
+
+  if (income === 'mid' && paye === 'no') {
+    return {
+      tone: 'amber',
+      icon: CircleAlert,
+      title: 'Yes, you need to file',
+      copy: "You're over £1k but under Personal Allowance. You need to file, but you likely won't owe much tax after expenses. We maximise those.",
+      cta: 'See how much you could save',
+    }
+  }
+
+  return {
+    tone: 'red',
+    icon: CircleAlert,
+    title: "Yes - let's get this filed properly",
+    copy: "Over £12,570 you're definitely over both allowances. HMRC already gets data from platforms like eBay/Etsy/Uber since 2024, so best to file. Good news: you can claim loads - mileage, phone, laptop, stock.",
+    cta: 'Get my fixed quote - £249',
+  }
+}
+
+const quizSlide = {
+  initial: { opacity: 0, x: 28 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -28 },
+  transition: { duration: 0.25, ease: 'easeOut' },
+}
+
+function DoINeedToFileQuiz() {
+  const [step, setStep] = useState(1)
+  const [answers, setAnswers] = useState({
+    income: '',
+    hustles: [],
+    paye: '',
+  })
+
+  const result = step === 4 ? quizResult(answers) : null
+  const progress = step === 4 ? 100 : ((step - 1) / 3) * 100
+
+  function resetQuiz() {
+    setStep(1)
+    setAnswers({ income: '', hustles: [], paye: '' })
+  }
+
+  function toggleHustle(id) {
+    setAnswers((current) => ({
+      ...current,
+      hustles: current.hustles.includes(id)
+        ? current.hustles.filter((item) => item !== id)
+        : [...current.hustles, id],
+    }))
+  }
+
+  const ResultIcon = result?.icon
+  const toneClass =
+    result?.tone === 'green'
+      ? 'bg-brand/10 text-brand'
+      : result?.tone === 'red'
+        ? 'bg-red-50 text-red-600'
+        : 'bg-highlight/30 text-ink'
+
+  return (
+    <section id="do-i-need-to-file" className="px-5 pb-16 md:px-8 md:pb-20">
+      <motion.div {...fade} className="mx-auto max-w-2xl text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+          Do I need to file? Two minutes. Straight answer.
+        </h2>
+        <p className="mt-3 text-ink/80">No account. No scare tactics. Just your numbers.</p>
+      </motion.div>
+
+      <motion.div
+        {...fade}
+        className="mx-auto mt-8 max-w-2xl overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 shadow-xl"
+      >
+        <div className="mb-6">
+          <p className="mb-2 text-sm font-medium text-ink/70">
+            {step === 4 ? 'Your result' : `Question ${step} of 3`}
+          </p>
+          <div className="h-2 overflow-hidden rounded-full bg-card">
+            <div
+              className="h-full rounded-full bg-brand transition-[width] duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {step === 1 ? (
+            <motion.div key="q1" {...quizSlide}>
+              <h3 className="text-xl font-bold tracking-tight md:text-2xl">
+                What did you make from your side hustle in the last tax year (6 April 2024 - 5 April
+                2025)?
+              </h3>
+              <div className="mt-6 grid gap-3">
+                {incomeOptions.map((option) => (
+                  <motion.button
+                    key={option.id}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => {
+                      setAnswers((current) => ({ ...current, income: option.id }))
+                      setStep(2)
+                    }}
+                    className="rounded-full border border-ink/10 bg-card px-6 py-3.5 text-left font-semibold"
+                  >
+                    {option.label}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          ) : null}
+
+          {step === 2 ? (
+            <motion.div key="q2" {...quizSlide}>
+              <h3 className="text-xl font-bold tracking-tight md:text-2xl">
+                Where does your side income come from? (pick all that apply)
+              </h3>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {hustlePills.map((option) => {
+                  const selected = answers.hustles.includes(option.id)
+                  return (
+                    <motion.button
+                      key={option.id}
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => toggleHustle(option.id)}
+                      className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold ${
+                        selected
+                          ? 'border-brand bg-brand/10 text-ink'
+                          : 'border-ink/10 bg-card text-ink'
+                      }`}
+                    >
+                      {selected ? <Check className="size-4 text-brand" aria-hidden="true" /> : null}
+                      {option.label}
+                    </motion.button>
+                  )
+                })}
+              </div>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.99 }}
+                disabled={answers.hustles.length === 0}
+                onClick={() => setStep(3)}
+                className="mt-6 w-full rounded-full bg-highlight px-6 py-3.5 font-semibold text-ink shadow-sm disabled:opacity-40"
+              >
+                Continue
+              </motion.button>
+            </motion.div>
+          ) : null}
+
+          {step === 3 ? (
+            <motion.div key="q3" {...quizSlide}>
+              <h3 className="text-xl font-bold tracking-tight md:text-2xl">
+                Did you have another job (PAYE) as well?
+              </h3>
+              <div className="mt-6 grid gap-3">
+                {payeOptions.map((option) => (
+                  <motion.button
+                    key={option.id}
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={() => {
+                      setAnswers((current) => ({ ...current, paye: option.id }))
+                      setStep(4)
+                    }}
+                    className="rounded-full border border-ink/10 bg-card px-6 py-3.5 text-left font-semibold"
+                  >
+                    {option.label}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          ) : null}
+
+          {result ? (
+            <motion.div key="result" {...quizSlide}>
+              <div className={`inline-flex rounded-full p-3 ${toneClass}`}>
+                <ResultIcon className="size-6" aria-hidden="true" />
+              </div>
+              <h3 className="mt-4 text-2xl font-extrabold tracking-tight md:text-3xl">{result.title}</h3>
+              <p className="mt-4 text-ink/80">{result.copy}</p>
+              {result.note ? (
+                <p className="mt-3 text-sm font-semibold text-ink">{result.note}</p>
+              ) : null}
+              <motion.a
+                href="#get-started"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={(event) => {
+                  event.preventDefault()
+                  scrollToStart()
+                }}
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-highlight px-6 py-3.5 text-center font-semibold text-ink shadow-sm sm:w-auto"
+              >
+                {result.cta}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </motion.a>
+              <p className="mt-5 text-sm text-ink/70">We filed 2,300+ like this. No HMRC jargon.</p>
+              <button
+                type="button"
+                onClick={resetQuiz}
+                className="mt-3 text-sm font-semibold text-brand underline underline-offset-4"
+              >
+                Retake quiz
+              </button>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </motion.div>
+      <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-ink/60">
+        This is guidance based on HMRC 24/25 rules, not formal advice. Takes 30 seconds.
+      </p>
+    </section>
+  )
+}
+
 function App() {
   const [toast, setToast] = useState('')
   const [form, setForm] = useState({
@@ -149,6 +412,8 @@ function App() {
             />
           </motion.div>
         </section>
+
+        <DoINeedToFileQuiz />
 
         <div className="sticky top-0 z-40 border-y border-ink/5 bg-cream/95">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-2.5 md:px-8">
